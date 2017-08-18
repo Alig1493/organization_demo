@@ -3,13 +3,18 @@ from rest_framework.permissions import IsAuthenticated
 from organization.models import IFrame, Organization
 from rest_framework import generics
 # Create your views here.
-from organization.serializers import IFrameSerializer
+from organization.serializers import IFrameSerializer, IFrameListSerializer
 from .permissions import OrganizationPermission
 
 
 class IFrameListCreate(generics.ListCreateAPIView):
     permission_classes = (IsAuthenticated, OrganizationPermission,)
-    serializer_class = IFrameSerializer
+
+    def get_serializer_class(self):
+        if self.request.POST:
+            return IFrameSerializer
+        else:
+            return IFrameListSerializer
 
     def get_queryset(self):
         return IFrame.objects.filter(organization__user=self.request.user)

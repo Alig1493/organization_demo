@@ -14,7 +14,7 @@ class Timestamp(models.Model):
 class IFrame(Timestamp):
     title = models.CharField(max_length=100)
     url = models.URLField()
-    organization = models.ForeignKey('organization.Organization', related_name='organization')
+    organization = models.ForeignKey('organization.Organization', related_name='organization', on_delete=models.CASCADE)
 
     def __str__(self):
         title = ""

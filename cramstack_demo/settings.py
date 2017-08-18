@@ -56,10 +56,10 @@ SITE_ID = 1
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-ACCOUNT_AUTHENTICATION_METHOD = 'email' # 'email' for email and account email required true
+ACCOUNT_AUTHENTICATION_METHOD = 'username'  # 'email' for email and account email required true
 # 'username' for username and username required true
-ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_EMAIL_REQUIRED = False
+ACCOUNT_USERNAME_REQUIRED = True
 LOGOUT_ON_PASSWORD_CHANGE = False
 
 # Following is added to enable registration with email instead of username
