@@ -37,8 +37,6 @@ class IFrameFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = IFrame
 
-    created_by = factory.SubFactory(UserFactory)
-    updated_by = factory.SubFactory(UserFactory)
     title = factory.Faker('company')
     organization = factory.SubFactory(OrganizationFactory)
 
