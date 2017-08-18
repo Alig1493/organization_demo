@@ -20,7 +20,8 @@ class IFrameListCreate(generics.ListCreateAPIView):
         return IFrame.objects.filter(organization__user=self.request.user)
 
     def perform_create(self, serializer):
-        serializer.save(organization=Organization.objects.get(user=self.request.user))
+        serializer.save(organization=Organization.objects.get(user=self.request.user,
+                                                              created_by=self.request.user))
 
 
 class IFrameDetails(generics.RetrieveUpdateDestroyAPIView):
@@ -31,3 +32,7 @@ class IFrameDetails(generics.RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         return IFrame.objects.filter(organization__user=self.request.user)
+
+    def perform_update(self, serializer):
+        serializer.save(organization=Organization.objects.get(user=self.request.user,
+                                                              updated_by=self.request.user))

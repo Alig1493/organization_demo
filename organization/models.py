@@ -12,6 +12,10 @@ class Timestamp(models.Model):
 
 
 class IFrame(Timestamp):
+    created_by = models.ForeignKey(User, blank=True, null=True, related_name="%(class)s_created_by",
+                                   on_delete=models.SET_NULL)
+    updated_by = models.ForeignKey(User, blank=True, null=True, related_name="%(class)s_updated_by",
+                                   on_delete=models.SET_NULL)
     title = models.CharField(max_length=100)
     url = models.URLField()
     organization = models.ForeignKey('organization.Organization', related_name='organization', on_delete=models.CASCADE)
