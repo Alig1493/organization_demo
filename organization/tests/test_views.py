@@ -18,7 +18,7 @@ class TestIFrame(TestCase):
         self.client.force_authenticate(user=self.user)
         self.organization.user = [self.user]
         self.organization.save()
-        url = reverse('organization:iframe_list_create')
+        url = reverse('organization:iframe:iframe_list_create')
         iframe = factory.build(dict, FACTORY_CLASS=IFrameFactory)
         # invalid url
         iframe['url'] = "asdasdasdasd"
@@ -38,7 +38,7 @@ class TestIFrame(TestCase):
         self.organization.user = [self.user]
         self.organization.save()
         iframe = IFrameFactory(organization=self.organization, url=self.url)
-        url = reverse('organization:iframe_details', args=[iframe.id])
+        url = reverse('organization:iframe:iframe_details', args=[iframe.id])
         title = 'something else'
         request = self.client.patch(url, {'title': title})
         # should pass test if user of same organization tries to modify organization links
@@ -52,7 +52,7 @@ class TestIFrame(TestCase):
         self.client.force_authenticate(user=user)
         organization = OrganizationFactory(user=[user])
         iframe = IFrameFactory(organization=self.organization, url=self.url)
-        url = reverse('organization:iframe_details', args=[iframe.id])
+        url = reverse('organization:iframe:iframe_details', args=[iframe.id])
         title = 'something else'
         request = self.client.patch(url, {'title': title})
         # should fail test if user of another organization tries to modify organization links
