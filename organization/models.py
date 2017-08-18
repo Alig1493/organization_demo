@@ -21,11 +21,9 @@ class IFrame(Timestamp):
     organization = models.ForeignKey('organization.Organization', related_name='organization', on_delete=models.CASCADE)
 
     def __str__(self):
-        title = ""
+        title = "No title present"
         if self.title:
             title = self.title
-        else:
-            title = self.url.title()
         return f"{title} - {self.organization.__str__()} - {self.url}"
 
     class Meta:
