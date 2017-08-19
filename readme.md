@@ -15,7 +15,9 @@ are enabled
 
 #### Tweaks and Modifications:
 1. Implemented a signal that made makes user a staff upon registration (creation of a user object that is).
-2. An extra permission class called "OrganizationPermission" which raises a validation error (clean error handling) if a user that is registered is not part of an organization.
+2. An extra permission class called "OrganizationPermission" which raises a validation error (clean error handling)
+if a user that is registered is not part of an organization tries to view
+and/or modify the iframe links.
 3. Implemented unit tests to add, modify and delete iframe links.
 
 #### Super admin credentials for the existing database:
