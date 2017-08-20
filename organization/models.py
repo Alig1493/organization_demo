@@ -24,7 +24,7 @@ class IFrame(Timestamp):
         title = "No title present"
         if self.title:
             title = self.title
-        return f"{title} - {self.organization.__str__()} - {self.url}"
+        return title + " - " + self.organization.__str__() + " - " + self.url
 
     class Meta:
         verbose_name_plural = "IFrames"
@@ -36,4 +36,4 @@ class Organization(Timestamp):
     user = models.ManyToManyField(User, related_name='user', blank=True)
 
     def __str__(self):
-        return f"{self.title}"
+        return self.title
