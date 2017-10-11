@@ -34,6 +34,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^api/auth/', include(auth_token_patterns)),
     url(r'^api/organization/', include('organization.urls', namespace='organization')),
+    url(r'^api/messenger/', include('bot.urls', namespace='messenger_bot')),
     url(r'^docs/$', schema_view),
 ]
 
