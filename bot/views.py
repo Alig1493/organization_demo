@@ -1,16 +1,19 @@
-from rest_framework.views import APIView
+from rest_framework import generics
 from rest_framework.response import Response
 
 # Create your views here.
 from bot.permissions import HasToken
 
 
-class Message(APIView):
+class Message(generics.ListCreateAPIView):
     permission_classes = [HasToken]
 
-    def get(self):
-        """
-        Returns a hub challenge back to messenger if 
-        permission is allowed
-        """
-        return Response(self.request.GET['hub.challenge'])
+    def get_queryset(self):
+        pass
+
+    def get_serializer(self, *args, **kwargs):
+        pass
+
+    def list(self, request, *args, **kwargs):
+        print(self.request.GET["hub.challenge"])
+        return Response(self.request.GET["hub.challenge"], content_type="text/plain")
