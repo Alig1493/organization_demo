@@ -25,16 +25,19 @@ class Message(generics.ListCreateAPIView):
         print("Decoded Body Message: ")
         for item, content in request.data.items():
             if isinstance(content, list):
+                print(f"Printing {item} items:")
                 for obj in content:
                     if isinstance(obj, dict):
                         for a, b in obj.items():
                             if isinstance(b, list):
+                                print(f"Printing {a} items:")
                                 for c in b:
                                     if isinstance(c, dict):
                                         for d, e in c.items():
                                             if isinstance(e, dict):
+                                                print(f"Printing {d} items:")
                                                 for f, g in e.items():
-                                                    print(f"{f} has {g}\n\n")
+                                                    print(f"{f} has {g}")
                                             else:
                                                 print(f"{d} has {e} \n\n")
                                     else:
