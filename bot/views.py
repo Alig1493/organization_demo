@@ -1,14 +1,13 @@
 import json
 from rest_framework import generics, status
-from rest_framework.response import Response
 from django.http import HttpResponse
 
 # Create your views here.
-from bot.permissions import HasToken
+from bot.permissions import FacebookAuthentication
 
 
 class Message(generics.ListCreateAPIView):
-    permission_classes = [HasToken]
+    permission_classes = [FacebookAuthentication]
 
     def get_queryset(self):
         pass
@@ -27,9 +26,10 @@ class Message(generics.ListCreateAPIView):
         incoming_message = json.loads(self.request.body.decode('utf-8'))
         for entry in incoming_message['entry']:
             for message in entry['messaging']:
-                print(message['message']['text'])
-                for content in message['message']:
-                    print(content)
+                print(message['message'])
+                for content, information in message['message'].items():
+                    print(f"{content} has {information}")
+
         # print(self.request.body)
         # print("Detailed contents: ")
         return HttpResponse()
