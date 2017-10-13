@@ -4,15 +4,14 @@ from django.http import HttpResponse
 
 # Create your views here.
 from bot.permissions import FacebookAuthentication
+from bot.serializers import MessengerPayloadSerializer
 
 
 class Message(generics.ListCreateAPIView):
     permission_classes = [FacebookAuthentication]
+    serializer_class = MessengerPayloadSerializer
 
     def get_queryset(self):
-        pass
-
-    def get_serializer(self, *args, **kwargs):
         pass
 
     def list(self, request, *args, **kwargs):
@@ -21,15 +20,29 @@ class Message(generics.ListCreateAPIView):
                             status=status.HTTP_200_OK)
 
     def create(self, request, *args, **kwargs):
+        print("Payload:")
+        print(f"{request.data}\n\n")
         print("Decoded Body Message: ")
-        # print(json.loads(self.request.body.decode('utf-8'))['entry'])
-        incoming_message = json.loads(self.request.body.decode('utf-8'))
-        for entry in incoming_message['entry']:
-            for message in entry['messaging']:
-                print(message['message'])
-                for content, information in message['message'].items():
-                    print(f"{content} has {information}")
-
-        # print(self.request.body)
-        # print("Detailed contents: ")
-        return HttpResponse()
+        for item, content in request.data.items():
+            if isinstance(content, list):
+                for obj in content:
+                    if isinstance(obj, dict):
+                        for a, b in obj.items():
+                            if isinstance(b, list):
+                                for c in b:
+                                    if isinstance(c, dict):
+                                        for d, e in c.items():
+                                            if isinstance(e, dict):
+                                                for f, g in e.items():
+                                                    print(f"{f} has {g}\n\n")
+                                            else:
+                                                print(f"{d} has {e} \n\n")
+                                    else:
+                                        print(f"{c}\n\n")
+                            else:
+                                print(f"{a} has {b}\n\n")
+                    else:
+                        print(f"{obj}\n\n")
+            else:
+                print(f"{item} has {content}\n\n")
+        return super(Message, self).create(request, *args, **kwargs)
