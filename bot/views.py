@@ -24,6 +24,7 @@ class Message(generics.ListCreateAPIView):
             super().create(request, *args, **kwargs)
         except Exception as e:
             print(e)
+            return HttpResponse()
 
 
     # def create(self, request, *args, **kwargs):
