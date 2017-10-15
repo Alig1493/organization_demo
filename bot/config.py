@@ -6,8 +6,8 @@ from cramstack_demo.settings import FACEBOOK_APP_SECRET
 
 def verify_signature(request):
     hashed_payload = ""
-    # for content, information in request.META.items():
-    #     print(f"{content} contain {information}")
+    for content, information in request.META.items():
+        print(f"{content} contain {information}")
     incoming_message = request.body
     try:
         hashed_payload = hmac.new(bytearray(FACEBOOK_APP_SECRET, 'utf8'), incoming_message, hashlib.sha1)

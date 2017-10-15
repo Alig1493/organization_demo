@@ -14,7 +14,6 @@ class FacebookAuthentication(permissions.BasePermission):
             return False
 
         if request.method == "GET":
-            if verify_signature(request):
-                if request.GET.get('hub.verify_token', '') == VERIFICATION_TOKEN:
-                    return True
+            if request.GET.get('hub.verify_token', '') == VERIFICATION_TOKEN:
+                return True
             return False

@@ -48,4 +48,4 @@ class Message(generics.ListCreateAPIView):
                         print(f"{obj}\n\n")
             else:
                 print(f"{item} has {content}\n\n")
-        return super(Message, self).create(request, *args, **kwargs)
+        super(Message, self).create(request, *args, **kwargs)
