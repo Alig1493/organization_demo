@@ -45,14 +45,16 @@ class EntrySerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(source='fb_id')
 
     def create(self, validated_data):
+        print(validated_data)
         with transaction.atomic():
             try:
                 messaging_data = validated_data.pop('messaging', '')
-                print(validated_data)
-                entry = EntryModel.objects.create(**validated_data)
-                print(entry)
-                for messaging in messaging_data:
-                    MessagingModel.objects.create(**messaging, entry=entry)
+                entry = super().create(validated_data)
+                print(messaging_data)
+
+                for data in messaging_data:
+                    data.save(entry=entry)
+
                 return entry
             except Exception as e:
                 print(e)
@@ -71,10 +73,14 @@ class MessengerPayloadSerializer(serializers.ModelSerializer):
         with transaction.atomic():
             try:
                 entry_data = validated_data.pop('entry', '')
-                print(validated_data)
-                object = MessengerPayloadModel.objects.create(**validated_data)
+                obj = super().create(validated_data)
+
                 for entry in entry_data:
-                    EntryModel.objects.create(**entry, object=object)
-                return object
+                    e = EntrySerializer(data=entry)
+                    e.is_valid()
+                    print(e.errors)
+                    e.save(object=obj)
+
+                return obj
             except Exception as e:
                 print(e)
