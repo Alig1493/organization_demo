@@ -1,67 +1,80 @@
+from django.db import transaction
 from rest_framework import serializers
 
-
-class FacebookIdSerializer(serializers.Serializer):
-
-    def create(self, validated_data):
-        pass
-
-    def update(self, instance, validated_data):
-        pass
-
-    id = serializers.IntegerField()
+from bot import fields
+from bot.models import (FacebookIdModel, MessageDetailModel, MessagingModel,
+                        MessengerPayloadModel, EntryModel)
 
 
-class MessageDetailSerializer(serializers.Serializer):
+class FacebookIdSerializer(serializers.ModelSerializer):
 
-    def create(self, validated_data):
-        pass
+    class Meta:
+        model = FacebookIdModel
+        fields = ('id',)
 
-    def update(self, instance, validated_data):
-        pass
-
-    mid = serializers.CharField()
-    seq = serializers.IntegerField()
-    text = serializers.CharField()
+    id = serializers.IntegerField(source='fb_id')
 
 
-class MessagingSerializer(serializers.Serializer):
+class MessageDetailSerializer(serializers.ModelSerializer):
 
-    def create(self, validated_data):
-        pass
+    class Meta:
+        model = MessageDetailModel
+        fields = '__all__'
 
-    def update(self, instance, validated_data):
-        pass
+
+class MessagingSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = MessagingModel
+        fields = ('timestamp', 'message', 'sender', 'recipient',)
 
     sender = FacebookIdSerializer()
     recipient = FacebookIdSerializer()
-    timestamp = serializers.IntegerField()
+    timestamp = fields.UnixDateTimeField(input_formats=['unix_timestamp'])
     message = MessageDetailSerializer()
 
 
-class EntrySerializer(serializers.Serializer):
+class EntrySerializer(serializers.ModelSerializer):
 
-    def create(self, validated_data):
-        pass
+    class Meta:
+        model = EntryModel
+        fields = ('time', 'id', 'messaging')
 
-    def update(self, instance, validated_data):
-        pass
-
-    id = serializers.CharField()
-    time = serializers.DateTimeField()
+    time = fields.UnixDateTimeField(input_formats=['unix_timestamp'])
     messaging = MessagingSerializer(many=True)
-
-
-class MessengerPayloadSerializer(serializers.Serializer):
+    id = serializers.IntegerField(source='fb_id')
 
     def create(self, validated_data):
-        print("Payload data in serializer:")
-        print(validated_data.get['object'])
-        print(validated_data.get['entry'])
-        pass
+        with transaction.atomic():
+            try:
+                messaging_data = validated_data.pop('messaging', '')
+                print(validated_data)
+                entry = EntryModel.objects.create(**validated_data)
+                print(entry)
+                for messaging in messaging_data:
+                    MessagingModel.objects.create(**messaging, entry=entry)
+                return entry
+            except Exception as e:
+                print(e)
 
-    def update(self, instance, validated_data):
-        pass
+
+class MessengerPayloadSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = MessengerPayloadModel
+        fields = '__all__'
 
     object = serializers.CharField(allow_blank=True)
     entry = EntrySerializer(many=True)
+
+    def create(self, validated_data):
+        with transaction.atomic():
+            try:
+                entry_data = validated_data.pop('entry', '')
+                print(validated_data)
+                object = MessengerPayloadModel.objects.create(**validated_data)
+                for entry in entry_data:
+                    EntryModel.objects.create(**entry, object=object)
+                return object
+            except Exception as e:
+                print(e)

@@ -51,6 +51,8 @@ INSTALLED_APPS = [
     'rest_framework_swagger',
 
     'organization',
+
+    'bot',
 ]
 
 SITE_ID = 1
