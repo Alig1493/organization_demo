@@ -6,7 +6,7 @@ from django.http import HttpResponse
 from rest_framework.permissions import AllowAny
 
 from bot.permissions import FacebookAuthentication
-from bot.serializers import MessengerPayloadSerializer, MessagingSerializer, EntrySerializer, DummySerializer
+from bot.serializers import (MessengerPayloadSerializer, DummySerializer)
 
 
 class Message(generics.ListCreateAPIView):
@@ -23,7 +23,42 @@ class Message(generics.ListCreateAPIView):
                             status=status.HTTP_200_OK)
 
     def create(self, request, *args, **kwargs):
-
+        # fb_id = []
+        #
+        # print("Payload:")
+        # print(f"{request.data}\n\n")
+        # print("Decoded Body Message: ")
+        #
+        # for item, content in request.data.items():
+        #     if isinstance(content, list):
+        #         print(f"Printing {item} list:")
+        #         for obj in content:
+        #             if isinstance(obj, dict):
+        #                 for a, b in obj.items():
+        #                     if a == 'id':
+        #                         fb_id.append(b)
+        #                     if isinstance(b, list):
+        #                         print(f"Printing {a} list:")
+        #                         for c in b:
+        #                             if isinstance(c, dict):
+        #                                 for d, e in c.items():
+        #                                     if isinstance(e, dict):
+        #                                         print(f"Printing {d} items:")
+        #                                         for f, g in e.items():
+        #                                             if f == 'id':
+        #                                                 fb_id.append(g)
+        #                                             print(f"{f} has {g}")
+        #                                     else:
+        #                                         print(f"{d} has {e} \n\n")
+        #                             else:
+        #                                 print(f"{c}\n\n")
+        #                     else:
+        #                         print(f"{a} has {b}\n\n")
+        #             else:
+        #                 print(f"{obj}\n\n")
+        #     else:
+        #         print(f"{item} has {content}\n\n")
+        # print(f"fb_char_id = {fb_id}")
         try:
             super().create(request, *args, **kwargs)
         except Exception as e:

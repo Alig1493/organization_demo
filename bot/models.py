@@ -35,3 +35,8 @@ class MessagingModel(models.Model):
     sender = models.OneToOneField(FacebookIdModel, related_name='sender')
     recipient = models.OneToOneField(FacebookIdModel, related_name='recipient')
     entry = models.ForeignKey(EntryModel, on_delete=models.CASCADE)
+
+
+class DummyModel(models.Model):
+
+    date = models.DateTimeField()

@@ -3,7 +3,7 @@ from rest_framework import serializers
 
 from bot import fields
 from bot.models import (FacebookIdModel, MessageDetailModel, MessagingModel,
-                        MessengerPayloadModel, EntryModel)
+                        MessengerPayloadModel, EntryModel, DummyModel)
 
 
 class FacebookIdSerializer(serializers.ModelSerializer):
@@ -52,7 +52,8 @@ class EntrySerializer(serializers.ModelSerializer):
                 print(messaging_data)
 
                 for data in messaging_data:
-                    data.save(entry=entry)
+                    print(data)
+                    data.save(entry=dict(entry))
 
                 return entry
             except Exception as e:
@@ -72,19 +73,21 @@ class MessengerPayloadSerializer(serializers.ModelSerializer):
         with transaction.atomic():
             try:
                 entry_data = validated_data.pop('entry', '')
-                obj = super().create(validated_data)
+                messaging = entry_data.pop('messaging', '')
 
                 for entry in entry_data:
-                    e = EntrySerializer(data=entry)
-                    e.is_valid()
-                    print(e.errors)
-                    e.save(object=obj)
+                    e = EntryModel.objects.create(**dict(entry), object=obj)
+                    print(e.id)
 
                 return obj
             except Exception as e:
                 print(e)
 
 
-class DummySerializer(serializers.Serializer):
+class DummySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = DummyModel
+        fields = '__all__'
 
     date = fields.UnixDateTimeField(input_formats=['unix_timestamp'])
