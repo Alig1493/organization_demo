@@ -45,7 +45,6 @@ class EntrySerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(source='fb_id')
 
     def create(self, validated_data):
-        print(validated_data)
         with transaction.atomic():
             try:
                 messaging_data = validated_data.pop('messaging', '')
@@ -84,3 +83,8 @@ class MessengerPayloadSerializer(serializers.ModelSerializer):
                 return obj
             except Exception as e:
                 print(e)
+
+
+class DummySerializer(serializers.Serializer):
+
+    date = fields.UnixDateTimeField(input_formats=['unix_timestamp'])
