@@ -2,6 +2,7 @@ from django.db import transaction
 from rest_framework import serializers
 
 from bot import fields
+from bot.config import save_page_message_entry
 from bot.models import (FacebookIdModel, MessageDetailModel, MessagingModel,
                         MessengerPayloadModel, EntryModel, DummyModel)
 
@@ -44,21 +45,6 @@ class EntrySerializer(serializers.ModelSerializer):
     messaging = MessagingSerializer(many=True)
     id = serializers.IntegerField(source='fb_id')
 
-    def create(self, validated_data):
-        with transaction.atomic():
-            try:
-                messaging_data = validated_data.pop('messaging', '')
-                entry = super().create(validated_data)
-                print(messaging_data)
-
-                for data in messaging_data:
-                    print(data)
-                    data.save(entry=dict(entry))
-
-                return entry
-            except Exception as e:
-                print(e)
-
 
 class MessengerPayloadSerializer(serializers.ModelSerializer):
 
@@ -67,21 +53,17 @@ class MessengerPayloadSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     object = serializers.CharField(allow_blank=True)
-    entry = EntrySerializer(many=True)
+    entry = EntrySerializer(many=True, write_only=True)
 
     def create(self, validated_data):
         with transaction.atomic():
-            try:
-                entry_data = validated_data.pop('entry', '')
-                messaging = entry_data.pop('messaging', '')
+            entry_data = validated_data.pop('entry', '')
+            obj = super().create(validated_data)
 
-                for entry in entry_data:
-                    e = EntryModel.objects.create(**dict(entry), object=obj)
-                    print(e.id)
+            if obj.object == "page":
+                save_page_message_entry(entry_data, obj)
 
-                return obj
-            except Exception as e:
-                print(e)
+            return obj
 
 
 class DummySerializer(serializers.ModelSerializer):
