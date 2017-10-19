@@ -189,4 +189,4 @@ JWT_AUTH = {
 
 VERIFICATION_TOKEN = os.environ.get("VERIFICATION_TOKEN", 'ali123')
 FACEBOOK_APP_SECRET = os.environ.get("FACEBOOK_APP_SECRET", '')
-
+PAGE_ACCESS_TOKEN = os.environ.get("PAGE_ACCESS_TOKEN", '')

@@ -1,15 +1,15 @@
 from django.db import models
-from bot.fields import UnixDateTimeField
 
+from bot.config import UserType
 
-# Create your models here.
 
 class FacebookIdModel(models.Model):
 
     fb_id = models.IntegerField()
+    user_type = models.IntegerField(choices=UserType.CHOICES, null=True)
 
     def __str__(self):
-        return f"{self.id}"
+        return f"{self.id} - {self.get_user_type_display()}"
 
 
 class MessageDetailModel(models.Model):

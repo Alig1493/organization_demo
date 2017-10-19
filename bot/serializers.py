@@ -2,7 +2,7 @@ from django.db import transaction
 from rest_framework import serializers
 
 from bot import fields
-from bot.config import save_page_message_entry
+from bot.utils import save_page_message_entry
 from bot.models import (FacebookIdModel, MessageDetailModel, MessagingModel,
                         MessengerPayloadModel, EntryModel, DummyModel)
 
