@@ -22,8 +22,10 @@ def save_page_message_entry(entry_data, obj):
             recipient_info = dict(messaging_info.pop('recipient', ''))
 
             if "text" in message_info:
+                print("inside text")
                 message_detail = text_message_object_save(message_info)
             else:
+                print("not inside text")
                 message_detail = attachment_message_object_save(message_info)
 
             sender_detail = FacebookIdModel.objects.create(fb_id=sender_info['fb_id'],
