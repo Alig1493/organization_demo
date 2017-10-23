@@ -40,7 +40,7 @@ class MessageDetailSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     attachments = AttachmentSerializer(many=True, required=False)
-    text = serializers.CharField()
+    text = serializers.CharField(required=False)
 
 
 class MessagingSerializer(serializers.ModelSerializer):
