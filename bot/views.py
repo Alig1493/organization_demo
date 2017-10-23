@@ -23,7 +23,10 @@ class Message(generics.ListCreateAPIView):
                             status=status.HTTP_200_OK)
 
     def create(self, request, *args, **kwargs):
-        super().create(request, *args, **kwargs)
+        try:
+            super().create(request, *args, **kwargs)
+        except Exception as e:
+            print(e)
         return HttpResponse()
 
 

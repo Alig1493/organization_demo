@@ -16,10 +16,20 @@ class MessageDetailModel(models.Model):
 
     mid = models.CharField(max_length=500)
     seq = models.IntegerField()
-    text = models.CharField(max_length=1000)
 
-    def __str__(self):
-        return f"Message Text: {self.text}"
+
+class PayloadModel(models.Model):
+
+    url = models.URLField()
+    sticker_id = models.IntegerField(null=True, blank=True)
+
+
+class AttachmentModel(models.Model):
+
+    type = models.CharField(max_length=1000)
+    message = models.OneToOneField(MessageDetailModel)
+    text = models.CharField(max_length=1000, blank=True)
+    payload = models.OneToOneField(PayloadModel, on_delete=models.CASCADE, null=True, blank=True)
 
 
 class MessengerPayloadModel(models.Model):

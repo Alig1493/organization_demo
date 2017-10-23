@@ -4,7 +4,7 @@ from rest_framework import serializers
 from bot import fields
 from bot.utils import save_page_message_entry
 from bot.models import (FacebookIdModel, MessageDetailModel, MessagingModel,
-                        MessengerPayloadModel, EntryModel, DummyModel)
+                        MessengerPayloadModel, EntryModel, DummyModel, PayloadModel, AttachmentModel)
 
 
 class FacebookIdSerializer(serializers.ModelSerializer):
@@ -16,11 +16,30 @@ class FacebookIdSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(source='fb_id')
 
 
+class PayloadSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = PayloadModel
+        fields = '__all__'
+
+
+class AttachmentSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = AttachmentModel
+        fields = ('type', 'payload',)
+
+    type = serializers.CharField(max_length=1000)
+    payload = PayloadSerializer()
+
+
 class MessageDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MessageDetailModel
         fields = '__all__'
+
+    attachments = AttachmentSerializer(many=True)
 
 
 class MessagingSerializer(serializers.ModelSerializer):
