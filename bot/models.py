@@ -1,3 +1,5 @@
+import re
+
 from django.db import models
 
 from bot.config import UserType
@@ -23,6 +25,9 @@ class PayloadModel(models.Model):
     url = models.URLField()
     file = models.FileField(upload_to='uploads/%Y/%m/%d/', blank=True, null=True)
     sticker_id = models.IntegerField(null=True, blank=True)
+
+    def __str__(self):
+        return re.split('[/&+=?]+', self.url)[4]
 
 
 class AttachmentModel(models.Model):
