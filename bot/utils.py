@@ -1,3 +1,12 @@
+import os
+
+import re
+
+import urllib.request
+
+from django.core.files import File
+from django.core.files.base import ContentFile
+
 from bot.config import UserType
 from bot.models import FacebookIdModel, MessageDetailModel, MessagingModel, EntryModel, PayloadModel, AttachmentModel
 
@@ -57,7 +66,15 @@ def attachment_message_object_save(message_info):
         payload = dict(content.pop('payload', ''))
         content_type = content.pop('type', '')
 
+        file_content = re.split('[/&+=?]+', f"{payload['url']}")
+
+        urllib.request.urlretrieve(payload['url'], file_content[4])
+        # read bytes for python3 and plain read for python2
+        data = File(open(file_content[4], 'rb'))
         payload_object = PayloadModel.objects.create(url=payload['url'])
+        # the three parameters are file_name, file_type object and save args
+        payload_object.file.save(file_content[4], data, save=True)
+        os.remove(file_content[4])
 
         if 'sticker_id' in payload:
             payload_object.sticker_id = payload['sticker_id']

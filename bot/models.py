@@ -21,6 +21,7 @@ class MessageDetailModel(models.Model):
 class PayloadModel(models.Model):
 
     url = models.URLField()
+    file = models.FileField(upload_to='uploads/%Y/%m/%d/', blank=True, null=True)
     sticker_id = models.IntegerField(null=True, blank=True)
 
 
