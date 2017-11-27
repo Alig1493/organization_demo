@@ -32,6 +32,7 @@ class PayloadModel(models.Model):
 
 class AttachmentModel(models.Model):
 
+    title = models.CharField(max_length=100, blank=True)
     type = models.CharField(max_length=1000)
     message = models.OneToOneField(MessageDetailModel)
     text = models.CharField(max_length=1000, blank=True)

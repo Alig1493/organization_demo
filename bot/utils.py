@@ -38,11 +38,11 @@ def save_page_message_entry(entry_data, obj):
             if "text" in message_info:
                 print("inside text")
                 text_message_object_save(message_info, message_detail)
+                message_content = AttachmentModel.objects.get(message=message_detail).text
             if "attachments" in message_info:
                 print("not inside text")
                 attachment_message_object_save(message_info, message_detail)
-
-            message_content = AttachmentModel.objects.get(message=message_detail).refresh_from_db()
+                message_content = AttachmentModel.objects.get(message=message_detail).payload
 
             sender_detail = FacebookIdModel.objects.create(fb_id=sender_info['fb_id'],
                                                            user_type=UserType.SENDER)
@@ -52,13 +52,15 @@ def save_page_message_entry(entry_data, obj):
             MessagingModel.objects.create(message=message_detail, timestamp=timestamp_info,
                                           sender=sender_detail, recipient=recipient_detail,
                                           entry=entry_detail)
+
+            # Get user details:
             user_details_url = f"https://graph.facebook.com/v2.11/{sender_detail.fb_id}"
             user_details_params = {'access_token': PAGE_ACCESS_TOKEN}
             user_details = requests.get(user_details_url, user_details_params).json()
             print("Current user details: " +json.dumps(user_details))
             print(f"Hello {user_details['first_name']}")
 
-
+            # Post message to user:
             message_url = f"https://graph.facebook.com/v2.11/me/messages?access_token={PAGE_ACCESS_TOKEN}"
             messaging_reply_content = json.dumps({"messaging_type": "RESPONSE",
                                                   "recipient": {"id": sender_detail.fb_id,
@@ -77,23 +79,41 @@ def text_message_object_save(message_info, message_detail):
 
 
 def attachment_message_object_save(message_info, message_detail):
+    print('url' in message_info['attachments'])
+    print(message_info['attachments'])
+    for i in message_info['attachments']:
+        print(dict(i))
 
     for content in message_info['attachments']:
-        payload = dict(content.pop('payload', ''))
         content_type = content.pop('type', '')
+        payload = content.pop('payload', '')
+        title = ""
 
-        file_content = re.split('[/&+=?]+', f"{payload['url']}")
+        if payload is not None:
+            payload = dict(payload)
+            file_content = re.split('[/&+=?]+', f"{payload['url']}")
+            urllib.request.urlretrieve(payload['url'], file_content[4])
+            # read bytes for python3 and plain read for python2
+            data = File(open(file_content[4], 'rb'))
+            payload_object = PayloadModel.objects.create(url=payload['url'])
+            # the three parameters are file_name, file_type object and save args
+            payload_object.file.save(file_content[4], data, save=True)
+            os.remove(file_content[4])
 
-        urllib.request.urlretrieve(payload['url'], file_content[4])
-        # read bytes for python3 and plain read for python2
-        data = File(open(file_content[4], 'rb'))
-        payload_object = PayloadModel.objects.create(url=payload['url'])
-        # the three parameters are file_name, file_type object and save args
-        payload_object.file.save(file_content[4], data, save=True)
-        os.remove(file_content[4])
+            if 'sticker_id' in payload:
+                payload_object.sticker_id = payload['sticker_id']
+                payload_object.save()
 
-        if 'sticker_id' in payload:
-            payload_object.sticker_id = payload['sticker_id']
-            payload_object.save()
+        if payload is None:
+            file_content = re.split('[/&+=?]+', f"{content['url']}")
+            urllib.request.urlretrieve(content['url'], file_content[4])
+            # read bytes for python3 and plain read for python2
+            data = File(open(file_content[4], 'rb'))
+            payload_object = PayloadModel.objects.create(url=content['url'])
+            # the three parameters are file_name, file_type object and save args
+            payload_object.file.save(file_content[4], data, save=True)
+            os.remove(file_content[4])
+            title = content['title']
 
-        AttachmentModel.objects.create(type=content_type, payload=payload_object, message=message_detail)
+        AttachmentModel.objects.create(title=title, type=content_type, payload=payload_object, message=message_detail)
+

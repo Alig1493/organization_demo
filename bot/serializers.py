@@ -25,12 +25,14 @@ class PayloadSerializer(serializers.ModelSerializer):
 
 class AttachmentSerializer(serializers.ModelSerializer):
 
+    url = serializers.URLField(allow_blank=True)
+
     class Meta:
         model = AttachmentModel
-        fields = ('type', 'payload',)
+        exclude = ('message', )
 
     type = serializers.CharField(max_length=1000)
-    payload = PayloadSerializer()
+    payload = PayloadSerializer(required=False, allow_null=True)
 
 
 class MessageDetailSerializer(serializers.ModelSerializer):
