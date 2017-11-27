@@ -37,6 +37,9 @@ class AttachmentModel(models.Model):
     text = models.CharField(max_length=1000, blank=True)
     payload = models.OneToOneField(PayloadModel, on_delete=models.CASCADE, null=True, blank=True)
 
+    def __str__(self):
+        return f"{self.type} - {self.text}"
+
 
 class MessengerPayloadModel(models.Model):
 
