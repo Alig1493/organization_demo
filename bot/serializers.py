@@ -25,7 +25,7 @@ class PayloadSerializer(serializers.ModelSerializer):
 
 class AttachmentSerializer(serializers.ModelSerializer):
 
-    url = serializers.URLField(allow_blank=True)
+    url = serializers.URLField(required=False, allow_blank=True)
 
     class Meta:
         model = AttachmentModel

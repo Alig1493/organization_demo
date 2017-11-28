@@ -39,9 +39,11 @@ def save_page_message_entry(entry_data, obj):
                 print("inside text")
                 text_message_object_save(message_info, message_detail)
                 message_content = AttachmentModel.objects.get(message=message_detail).text
-            if "attachments" in message_info:
+            else:
                 print("not inside text")
                 attachment_message_object_save(message_info, message_detail)
+
+            if "attachments" in message_info:
                 message_content = AttachmentModel.objects.get(message=message_detail).payload
 
             sender_detail = FacebookIdModel.objects.create(fb_id=sender_info['fb_id'],
@@ -75,7 +77,21 @@ def save_page_message_entry(entry_data, obj):
 
 
 def text_message_object_save(message_info, message_detail):
-    AttachmentModel.objects.create(type='text', text=message_info['text'], message=message_detail)
+    attachment = AttachmentModel.objects.create(type='text', text=message_info['text'], message=message_detail)
+    print("--------------------------")
+    if "attachments" in message_info:
+        print(message_info['attachments'])
+        for items in message_info['attachments']:
+            print("---------------------------")
+            print(dict(items))
+            print("---------------------------")
+            file_content = re.split('[/&+=?]+', f"{items['url']}")
+            print(file_content)
+            payload_object = PayloadModel.objects.create(url=items['url'])
+            attachment.title = items['title']
+            attachment.type = items['type']
+            attachment.payload = payload_object
+            attachment.save()
 
 
 def attachment_message_object_save(message_info, message_detail):
@@ -91,6 +107,7 @@ def attachment_message_object_save(message_info, message_detail):
 
         if payload is not None:
             payload = dict(payload)
+            print(payload)
             file_content = re.split('[/&+=?]+', f"{payload['url']}")
             urllib.request.urlretrieve(payload['url'], file_content[4])
             # read bytes for python3 and plain read for python2
@@ -104,16 +121,5 @@ def attachment_message_object_save(message_info, message_detail):
                 payload_object.sticker_id = payload['sticker_id']
                 payload_object.save()
 
-        if payload is None:
-            file_content = re.split('[/&+=?]+', f"{content['url']}")
-            urllib.request.urlretrieve(content['url'], file_content[4])
-            # read bytes for python3 and plain read for python2
-            data = File(open(file_content[4], 'rb'))
-            payload_object = PayloadModel.objects.create(url=content['url'])
-            # the three parameters are file_name, file_type object and save args
-            payload_object.file.save(file_content[4], data, save=True)
-            os.remove(file_content[4])
-            title = content['title']
-
-        AttachmentModel.objects.create(title=title, type=content_type, payload=payload_object, message=message_detail)
+            AttachmentModel.objects.create(title=title, type=content_type, payload=payload_object, message=message_detail)
 

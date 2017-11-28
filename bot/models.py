@@ -19,6 +19,9 @@ class MessageDetailModel(models.Model):
     mid = models.CharField(max_length=500)
     seq = models.IntegerField()
 
+    def __str__(self):
+        return self.mid
+
 
 class PayloadModel(models.Model):
 
