@@ -28,13 +28,7 @@ class Post(generics.ListCreateAPIView):
 
     def create(self, request, *args, **kwargs):
         try:
-            print(request.data)
-            # dummy_post = requests.get(f"https://graph.facebook.com/v2.11/1144617102337592/feed?access_token={PAGE_ACCESS_TOKEN}")
-            # print(dummy_post.content)
-            # print(dummy_post.status_code)
             super().create(request, *args, **kwargs)
         except Exception as e:
             print(e)
         return HttpResponse()
-
-

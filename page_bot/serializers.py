@@ -1,38 +1,53 @@
+import datetime
+
 from django.db import transaction
 from rest_framework import serializers
 
 from bot import fields
 from page_bot.models import PagePayloadModel, PageEntryModel, PageChangesModel, PageValueModel, PageFromModel
+from page_bot.utils import save_page_post_entry
 
 
 class PageFromSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(source='sender_id')
 
     class Meta:
         model = PageFromModel
-        fields = '__all__'
+        fields = ('id', 'name',)
 
 
 class PageValueSerializer(serializers.ModelSerializer):
 
+    from_object = PageFromSerializer()
+    created_time = fields.UnixDateTimeField(input_formats=['unix_timestamp'])
+
     class Meta:
         model = PageValueModel
-        fields = '__all__'
+        fields = ('verb', 'item', 'message',
+                  'post_id', 'published', 'from_object',
+                  'created_time',)
+
+    def to_internal_value(self, data):
+        data['from_object'] = data.pop('from', '')
+        return super(PageValueSerializer, self).to_internal_value(data)
 
 
 class PageChangesSerializer(serializers.ModelSerializer):
-    value = PageValueSerializer(required=True)
+    value = PageValueSerializer()
 
     class Meta:
         model = PageChangesModel
-        fields = '__all__'
+        exclude = ('page_entry',)
 
 
 class PageEntrySerializer(serializers.ModelSerializer):
     changes = PageChangesSerializer(many=True)
+    id = serializers.IntegerField(source='recipient_id')
+    time = fields.UnixDateTimeField(input_formats=['unix_timestamp'])
 
     class Meta:
         model = PageEntryModel
-        fields = '__all__'
+        fields = ("changes", "id", "time",)
 
 
 class PagePayloadSerializer(serializers.ModelSerializer):
@@ -43,12 +58,13 @@ class PagePayloadSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def create(self, validated_data):
-        print(validated_data)
-        for items in validated_data['entry']:
-            print(dict(items))
-            print(dict(items).pop('changes', ''))
-            for sub_items in dict(items).pop('changes', ''):
-                print(dict(sub_items))
-                print(dict(dict(sub_items).pop('value','')))
-        print(super().is_valid())
-        return validated_data
+        try:
+            with transaction.atomic():
+                print(validated_data)
+                entry = validated_data.pop('entry', '')
+                obj = super().create(validated_data)
+                save_page_post_entry(obj, entry)
+                print(obj)
+                return obj
+        except Exception as e:
+            print(e)
