@@ -32,12 +32,12 @@ class PageValueModel(models.Model):
     verb = models.CharField(max_length=50)
     item = models.CharField(max_length=50)
     message = models.CharField(max_length=1000)
-    post_id = models.IntegerField()
+    post_id = models.CharField(max_length=1000)
     published = models.IntegerField()
     created_time = models.DateTimeField()
 
     def __str__(self):
-        return f"{self.recipient_id} - {self.message}"
+        return f"{self.created_time} - {self.message}"
 
 
 class PageFromModel(models.Model):
@@ -46,7 +46,7 @@ class PageFromModel(models.Model):
     sender_id = models.IntegerField()
 
     def __str__(self):
-        return f"{self.sender_id} - {self.message}"
+        return f"{self.name}"
 
 
 class PageSubscribersModel(models.Model):
