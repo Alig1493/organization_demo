@@ -50,6 +50,7 @@ class PageFromModel(models.Model):
 
 
 class PageSubscribersModel(models.Model):
+    subscriber_name = models.CharField(max_length=1000, default="")
     subscriber_id = models.IntegerField()
 
     def __str__(self):

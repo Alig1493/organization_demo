@@ -9,7 +9,7 @@ import requests
 from django.core.files import File
 
 from cramstack_demo.settings import PAGE_ACCESS_TOKEN
-from page_bot.models import PageEntryModel, PageChangesModel, PageValueModel, PageFromModel
+from page_bot.models import PageEntryModel, PageChangesModel, PageValueModel, PageFromModel, PageSubscribersModel
 
 
 def save_page_post_entry(payload_object, entry):
@@ -43,3 +43,16 @@ def save_page_post_entry(payload_object, entry):
                                                          page_changes=changes_object)
             PageFromModel.objects.create(value=value_object, name=from_info.get('name', ''),
                                          sender_id=from_info.get('sender_id', ''))
+
+            for subscriber in PageSubscribersModel.objects.all():
+                message_url = f"https://graph.facebook.com/v2.11/me/messages?access_token={PAGE_ACCESS_TOKEN}"
+                messaging_reply_content = json.dumps({"messaging_type": "RESPONSE",
+                                                      "recipient": {"id": subscriber.subscriber_id,
+                                                                    "name": subscriber.subscriber_name},
+                                                      "message": {"text": f"Hello {subscriber.subscriber_name}. "
+                                                                          f"\nToday's post message: "
+                                                                          f"{value_object.message}"}
+                                                      })
+                status = requests.post(message_url, headers={"Content-Type": "application/json"},
+                                       data=messaging_reply_content)
+                print(status)
