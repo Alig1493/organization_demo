@@ -56,12 +56,16 @@ def save_page_message_entry(entry_data, obj):
                                           entry=entry_detail)
 
             # Get user details:
-            PageSubscribersModel.objects.create(subscriber_id=sender_detail.fb_id)
             user_details_url = f"https://graph.facebook.com/v2.11/{sender_detail.fb_id}"
             user_details_params = {'access_token': PAGE_ACCESS_TOKEN}
             user_details = requests.get(user_details_url, user_details_params).json()
             print("Current user details: " +json.dumps(user_details))
             print(f"Hello {user_details['first_name']}")
+
+            # save subscriber
+            if len(PageSubscribersModel.objects.filter(subscriber_id=sender_detail.fb_id)) == 0:
+                PageSubscribersModel.objects.create(subscriber_name=user_details['first_name'],
+                                                    subscriber_id=sender_detail.fb_id)
 
             # Post message to user:
             message_url = f"https://graph.facebook.com/v2.11/me/messages?access_token={PAGE_ACCESS_TOKEN}"
