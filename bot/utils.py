@@ -34,17 +34,17 @@ def save_page_message_entry(entry_data, obj):
             recipient_info = dict(messaging_info.pop('recipient', ''))
             message_detail = MessageDetailModel.objects.create(mid=message_info['mid'],
                                                                seq=message_info['seq'])
-
+            message_content = ""
             if "text" in message_info:
                 print("inside text")
                 text_message_object_save(message_info, message_detail)
-                message_content = AttachmentModel.objects.get(message=message_detail).text
+                message_content += AttachmentModel.objects.get(message=message_detail).text
             else:
                 print("not inside text")
                 attachment_message_object_save(message_info, message_detail)
 
             if "attachments" in message_info:
-                message_content = AttachmentModel.objects.get(message=message_detail).payload
+                message_content += AttachmentModel.objects.get(message=message_detail).payload
 
             sender_detail = FacebookIdModel.objects.create(fb_id=sender_info['fb_id'],
                                                            user_type=UserType.SENDER)
@@ -66,6 +66,7 @@ def save_page_message_entry(entry_data, obj):
             if len(PageSubscribersModel.objects.filter(subscriber_id=sender_detail.fb_id)) == 0:
                 PageSubscribersModel.objects.create(subscriber_name=user_details['first_name'],
                                                     subscriber_id=sender_detail.fb_id)
+                message_content += "\nYou have been registered!"
 
             # Post message to user:
             message_url = f"https://graph.facebook.com/v2.11/me/messages?access_token={PAGE_ACCESS_TOKEN}"

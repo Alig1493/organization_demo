@@ -53,7 +53,9 @@ INSTALLED_APPS = [
     'organization',
 
     'bot',
-    'page_bot'
+    'page_bot',
+
+    'warning',
 ]
 
 SITE_ID = 1

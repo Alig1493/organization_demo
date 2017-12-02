@@ -56,3 +56,13 @@ def save_page_post_entry(payload_object, entry):
                 status = requests.post(message_url, headers={"Content-Type": "application/json"},
                                        data=messaging_reply_content)
                 print(status)
+
+
+def get_object_or_none(model_class, **kwargs):
+    """Identical to get_object_or_404, except instead of returning Http404,
+    this returns None.
+    """
+    try:
+        return model_class.objects.get(**kwargs)
+    except model_class.DoesNotExist:
+        return None
