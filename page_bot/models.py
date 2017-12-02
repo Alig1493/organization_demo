@@ -54,4 +54,4 @@ class PageSubscribersModel(models.Model):
     subscriber_id = models.IntegerField()
 
     def __str__(self):
-        return f"{self.subscriber_id}"
+        return f"{self.subscriber_id} - {self.subscriber_name}"

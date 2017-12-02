@@ -37,6 +37,7 @@ urlpatterns = [
     url(r'^api/messenger/', include('bot.urls', namespace='messenger_bot')),
     url(r'^api/page/', include('page_bot.urls', namespace='page_bot')),
     url(r'^docs/$', schema_view),
+    url(r'^api/', include('warning.urls', namespace='warning'))
 ]
 
 if settings.DEBUG is True:
