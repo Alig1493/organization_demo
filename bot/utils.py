@@ -121,5 +121,6 @@ def attachment_message_object_save(message_info, message_detail):
                 payload_object.sticker_id = payload['sticker_id']
                 payload_object.save()
 
-            AttachmentModel.objects.create(title=title, type=content_type, payload=payload_object, message=message_detail)
+            AttachmentModel.objects.create(title=title, type=content_type, payload=payload_object,
+                                           message=message_detail)
 
