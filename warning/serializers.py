@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from  rest_framework.serializers import ValidationError
+from rest_framework.serializers import ValidationError
 
 from warning.config import phone_validator
 from warning.models import User, WarningSmsModel, LostModel
@@ -22,6 +22,8 @@ class WarningSerializer(serializers.ModelSerializer):
 
 
 class LostSerializer(serializers.ModelSerializer):
+
+    family = serializers.PrimaryKeyRelatedField(many=True, queryset=User.objects.all())
 
     class Meta:
         model = LostModel
