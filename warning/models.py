@@ -7,6 +7,9 @@ from warning.config import phone_validator, WarningType
 class Thana(models.Model):
     name = models.CharField(max_length=100)
 
+    def __str__(self):
+        return self.name
+
 
 class TemporaryLocation(models.Model):
     thana = models.ForeignKey(Thana, on_delete=models.CASCADE)
