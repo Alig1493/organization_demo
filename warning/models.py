@@ -18,7 +18,7 @@ class TemporaryLocation(models.Model):
 
 class User(models.Model):
     name = models.CharField(max_length=1000)
-    phone = models.CharField(max_length=1000)
+    phone = models.CharField(max_length=1000, unique=True)
     family_number = models.CharField(max_length=1000, blank=True)
     thana = models.ForeignKey(Thana)
     temporary_location = models.CharField(max_length=1000, blank=True, default="")
