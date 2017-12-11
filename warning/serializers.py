@@ -35,11 +35,14 @@ class LostSerializer(serializers.ModelSerializer):
         user = attrs.get('user', '')
 
         if (phone or user) is not None:
-            if phone is not None:
+            if user is None:
                 user = get_object_or_none(User, phone__iexact=phone)
 
                 if user:
                     attrs['user'] = user
+
+            else:
+                attrs['phone'] = User.objects.get(user=LostModel.objects.filter(user=user)[0]).phone
         else:
             raise ValidationError("Either phone or user must be present!")
 
