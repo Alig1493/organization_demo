@@ -17,6 +17,21 @@ class UserType(object):
     )
 
 
+class MessagingType(object):
+
+    RESPONSE = "RESPONSE"
+    UPDATE = "UPDATE"
+    MESSAGE_TAG = "MESSAGE_TAG"
+    NON_PROMOTIONAL_SUBSCRIPTION = "NON_PROMOTIONAL_SUBSCRIPTION"
+
+    CHOICES = (
+        (RESPONSE, "Response"),
+        (UPDATE, "Update"),
+        (MESSAGE_TAG, "Message Tag"),
+        (NON_PROMOTIONAL_SUBSCRIPTION, "Non Promotional Subscription")
+    )
+
+
 def verify_signature(request):
     hashed_payload = ""
     # for content, information in request.META.items():

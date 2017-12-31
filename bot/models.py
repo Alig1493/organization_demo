@@ -2,13 +2,13 @@ import re
 
 from django.db import models
 
-from bot.config import UserType
+from bot.config import UserType, MessagingType
 
 
 class FacebookIdModel(models.Model):
 
     fb_id = models.IntegerField()
-    user_type = models.IntegerField(choices=UserType.CHOICES, null=True)
+    user_type = models.IntegerField(choices=UserType.CHOICES, null=True, blank=True)
 
     def __str__(self):
         return f"{self.id} - {self.get_user_type_display()}"
@@ -28,6 +28,7 @@ class PayloadModel(models.Model):
     url = models.URLField()
     file = models.FileField(upload_to='uploads/%Y/%m/%d/', blank=True, null=True)
     sticker_id = models.IntegerField(null=True, blank=True)
+    is_reusable = models.NullBooleanField(help_text="Only applicable when sending messages as a response")
 
     def __str__(self):
         return re.split('[/&+=?]+', self.url)[4]
@@ -65,6 +66,7 @@ class EntryModel(models.Model):
 
 
 class MessagingModel(models.Model):
+    """Recipient Messaging Model"""
 
     timestamp = models.DateTimeField()
     message = models.OneToOneField(MessageDetailModel)
@@ -76,6 +78,8 @@ class MessagingModel(models.Model):
         return f"Sender ID: {self.sender.__str__()} - Recipient ID: {self.recipient.__str__()}-"
 
 
-class DummyModel(models.Model):
+class SendMessagingModel(models.Model):
 
-    date = models.DateTimeField()
+    messaging_type = models.CharField(choices=MessagingType.CHOICES, null=True, max_length=1000)
+    recipient = models.OneToOneField(FacebookIdModel)
+    message = models.ForeignKey(AttachmentModel)

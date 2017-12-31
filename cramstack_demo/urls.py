@@ -30,14 +30,18 @@ auth_token_patterns = [
     url(r'^jwt-token-verify/', verify_jwt_token),
 ]
 
+api_patterns = [
+    url(r'^auth/', include(auth_token_patterns, namespace='auth')),
+    url(r'^organization/', include('organization.urls', namespace='organization')),
+    url(r'^messenger/', include('bot.urls', namespace='messenger_bot')),
+    url(r'^page/', include('page_bot.urls', namespace='page_bot')),
+    url(r'^warning/', include('warning.urls', namespace='warning'))
+]
+
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^api/auth/', include(auth_token_patterns)),
-    url(r'^api/organization/', include('organization.urls', namespace='organization')),
-    url(r'^api/messenger/', include('bot.urls', namespace='messenger_bot')),
-    url(r'^api/page/', include('page_bot.urls', namespace='page_bot')),
     url(r'^docs/$', schema_view),
-    url(r'^api/warning/', include('warning.urls', namespace='warning'))
+    url(r'^api/', include(api_patterns, namespace='api')),
 ]
 
 if settings.DEBUG is True:

@@ -10,6 +10,7 @@ from django.core.files import File
 
 from bot.config import UserType
 from bot.models import FacebookIdModel, MessageDetailModel, MessagingModel, EntryModel, PayloadModel, AttachmentModel
+# from bot.serializers import SendMessagingSerializer, FacebookIdSerializer, MessageDetailSerializer
 from cramstack_demo.settings import PAGE_ACCESS_TOKEN
 from page_bot.models import PageSubscribersModel
 
@@ -62,45 +63,6 @@ def save_user_info(message_detail, timestamp_info, sender_info, recipient_info, 
                                   entry=entry_detail)
 
     send_facebook_message(sender_detail, message_detail)
-
-
-def send_facebook_message(sender_detail, message_detail):
-
-    message_content = ""
-
-    attachment_payload = AttachmentModel.objects.get(message=message_detail)
-
-    if attachment_payload.text:
-        message_content += AttachmentModel.objects.get(message=message_detail).text
-    else:
-        message_content += AttachmentModel.objects.get(message=message_detail).payload.url
-
-    # Get user details:
-    user_details = retrieve_user_facebook_information(sender_detail)
-
-    # save subscriber
-    if len(PageSubscribersModel.objects.filter(subscriber_id=sender_detail.fb_id)) == 0:
-        PageSubscribersModel.objects.create(subscriber_name=user_details['first_name'],
-                                            subscriber_id=sender_detail.fb_id)
-        message_content += "\nYou have been registered!"
-
-    # Post message to user:
-    send_message_to_facebook_users(sender_detail, user_details, message_content)
-
-
-def send_message_to_facebook_users(sender_detail, user_details, message_content):
-
-    message_url = f"https://graph.facebook.com/v2.11/me/messages?access_token={PAGE_ACCESS_TOKEN}"
-    messaging_reply_content = json.dumps({"messaging_type": "RESPONSE",
-                                          "recipient": {"id": sender_detail.fb_id,
-                                                        "name": user_details['first_name']},
-                                          "message": {"text": f"Hello {user_details['first_name']}. "
-                                                              f"How can I assist you today?"
-                                                              f"\nYour message: {message_content}"}
-                                          })
-    status = requests.post(message_url, headers={"Content-Type": "application/json"},
-                           data=messaging_reply_content)
-    print(status.json())
 
 
 def retrieve_user_facebook_information(sender_detail):
@@ -163,3 +125,47 @@ def attachment_message_object_save(message_info, message_detail):
             AttachmentModel.objects.create(title=title, type=content_type,
                                            payload=payload_object, message=message_detail)
 
+
+def send_facebook_message(sender_detail, message_detail):
+
+    message_content = ""
+
+    attachment_payload = AttachmentModel.objects.get(message=message_detail)
+
+    if attachment_payload.text:
+        message_content += AttachmentModel.objects.get(message=message_detail).text
+    else:
+        message_content += AttachmentModel.objects.get(message=message_detail).payload.url
+
+    # Get user details:
+    user_details = retrieve_user_facebook_information(sender_detail)
+
+    # save subscriber
+    if len(PageSubscribersModel.objects.filter(subscriber_id=sender_detail.fb_id)) == 0:
+        PageSubscribersModel.objects.create(subscriber_name=user_details['first_name'],
+                                            subscriber_id=sender_detail.fb_id)
+        message_content += "\nYou have been registered!"
+
+    # Post message to user:
+    send_text_message_to_facebook_users(sender_detail, user_details, message_content)
+
+
+def send_text_message_to_facebook_users(sender_detail, user_details, message_content):
+
+    message_url = f"https://graph.facebook.com/v2.11/me/messages?access_token={PAGE_ACCESS_TOKEN}"
+    # messaging_reply_content = json.dumps({"messaging_type": "RESPONSE",
+    #                                       "recipient": {"id": sender_detail.fb_id,
+    #                                                     "name": user_details['first_name']},
+    #                                       "message": {"text": f"Hello {user_details['first_name']}. "
+    #                                                           f"How can I assist you today?"
+    #                                                           f"\nYour message: {message_content}"}
+    #                                       })
+    # message_content = (f"Hello {user_details['first_name']}. How can I assist you today? "
+    #                    f"\nYour message: {message_content}")
+    # messaging_reply_content = SendMessagingSerializer(recipient=FacebookIdSerializer(id=sender_detail.fb_id),
+    #                                                   message=MessageDetailSerializer(type="text",
+    #                                                                                   text=message_content))
+    # print(messaging_reply_content.is_valid())
+    # status = requests.post(message_url, headers={"Content-Type": "application/json"},
+    #                        data=messaging_reply_content)
+    # print(status.json())

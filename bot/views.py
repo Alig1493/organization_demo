@@ -1,12 +1,8 @@
-import json
 from rest_framework import generics, status
 from django.http import HttpResponse
 
-# Create your views here.
-from rest_framework.permissions import AllowAny
-
 from bot.permissions import FacebookAuthentication
-from bot.serializers import (MessengerPayloadSerializer, DummySerializer)
+from bot.serializers import (MessengerPayloadSerializer)
 
 
 class Message(generics.ListCreateAPIView):
@@ -29,8 +25,3 @@ class Message(generics.ListCreateAPIView):
         except Exception as e:
             print(e)
         return HttpResponse()
-
-
-class DummyView(generics.CreateAPIView):
-    serializer_class = DummySerializer
-    permission_classes = [AllowAny]
