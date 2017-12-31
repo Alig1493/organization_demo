@@ -153,19 +153,16 @@ def send_facebook_message(sender_detail, message_detail):
 def send_text_message_to_facebook_users(sender_detail, user_details, message_content):
 
     message_url = f"https://graph.facebook.com/v2.11/me/messages?access_token={PAGE_ACCESS_TOKEN}"
-    # messaging_reply_content = json.dumps({"messaging_type": "RESPONSE",
-    #                                       "recipient": {"id": sender_detail.fb_id,
-    #                                                     "name": user_details['first_name']},
-    #                                       "message": {"text": f"Hello {user_details['first_name']}. "
-    #                                                           f"How can I assist you today?"
-    #                                                           f"\nYour message: {message_content}"}
-    #                                       })
-    # message_content = (f"Hello {user_details['first_name']}. How can I assist you today? "
-    #                    f"\nYour message: {message_content}")
+    message_content = (f"Hello {user_details['first_name']}. How can I assist you today?"
+                       f"\nYour message: {message_content}")
+    messaging_reply_content = json.dumps({"messaging_type": "RESPONSE",
+                                          "recipient": {"id": sender_detail.fb_id,
+                                                        "name": user_details['first_name']},
+                                          "message": {"text": message_content}})
     # messaging_reply_content = SendMessagingSerializer(recipient=FacebookIdSerializer(id=sender_detail.fb_id),
     #                                                   message=MessageDetailSerializer(type="text",
     #                                                                                   text=message_content))
     # print(messaging_reply_content.is_valid())
-    # status = requests.post(message_url, headers={"Content-Type": "application/json"},
-    #                        data=messaging_reply_content)
-    # print(status.json())
+    status = requests.post(message_url, headers={"Content-Type": "application/json"},
+                           data=messaging_reply_content)
+    print(status.json())

@@ -104,3 +104,4 @@ static/
 media/
 
 .idea/
+/db.sqlite3
