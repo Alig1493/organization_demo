@@ -39,12 +39,12 @@ class Post(generics.ListCreateAPIView):
             # super().create(request, *args, **kwargs)
             # print(serializer.data)
             # print(dir(serializer))
-            print("FUCKING QUERY SHIT!!!!")
-            attachment = self.get_attachment_detail(data=serializer.data)
-            print(attachment.text)
-            print(attachment.text is None)
-            print(attachment.payload)
-            print(attachment.payload is None)
+            # print("FUCKING QUERY SHIT!!!!")
+            # attachment = self.get_attachment_detail(data=serializer.data)
+            # print(attachment.text)
+            # print(attachment.text is None)
+            # print(attachment.payload)
+            # print(attachment.payload is None)
 
         except Exception as e:
             print(e)

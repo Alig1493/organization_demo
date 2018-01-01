@@ -12,7 +12,9 @@ from bot.config import UserType
 from bot.models import FacebookIdModel, MessageDetailModel, MessagingModel, EntryModel, PayloadModel, AttachmentModel
 # from bot.serializers import SendMessagingSerializer, FacebookIdSerializer, MessageDetailSerializer
 from cramstack_demo.settings import PAGE_ACCESS_TOKEN
+from page_bot.messages import get_started, find_teacher, contact_teacher
 from page_bot.models import PageSubscribersModel
+from warning.models import User
 
 message_types = ["text", "attachments"]
 
@@ -63,16 +65,6 @@ def save_user_info(message_detail, timestamp_info, sender_info, recipient_info, 
                                   entry=entry_detail)
 
     send_facebook_message(sender_detail, message_detail)
-
-
-def retrieve_user_facebook_information(sender_detail):
-
-    user_details_url = f"https://graph.facebook.com/v2.11/{sender_detail.fb_id}"
-    user_details_params = {'access_token': PAGE_ACCESS_TOKEN}
-    user_details = requests.get(user_details_url, user_details_params).json()
-    print("Current user details: " + json.dumps(user_details))
-    print(f"Hello {user_details['first_name']}")
-    return user_details
 
 
 def text_message_object_save(message_info, message_detail):
@@ -150,15 +142,26 @@ def send_facebook_message(sender_detail, message_detail):
     send_text_message_to_facebook_users(sender_detail, user_details, message_content)
 
 
+def retrieve_user_facebook_information(sender_detail):
+
+    user_details_url = f"https://graph.facebook.com/v2.11/{sender_detail.fb_id}"
+    user_details_params = {'access_token': PAGE_ACCESS_TOKEN}
+    user_details = requests.get(user_details_url, user_details_params).json()
+    print("Current user details: " + json.dumps(user_details))
+    print(f"Hello {user_details['first_name']}")
+    return user_details
+
+
 def send_text_message_to_facebook_users(sender_detail, user_details, message_content):
 
     message_url = f"https://graph.facebook.com/v2.11/me/messages?access_token={PAGE_ACCESS_TOKEN}"
-    message_content = (f"Hello {user_details['first_name']}. How can I assist you today?"
-                       f"\nYour message: {message_content}")
-    messaging_reply_content = json.dumps({"messaging_type": "RESPONSE",
-                                          "recipient": {"id": sender_detail.fb_id,
-                                                        "name": user_details['first_name']},
-                                          "message": {"text": message_content}})
+    if "get started".lower() in message_content.lower():
+        messaging_reply_content = find_teacher(sender_detail, user_details)
+    elif User.objects.filter(name__contains=message_content).exists():
+        messaging_reply_content = contact_teacher(sender_detail, user_details,
+                                                  User.objects.filter(name__contains=message_content)[0])
+    else:
+        messaging_reply_content = get_started(sender_detail, user_details)
     # messaging_reply_content = SendMessagingSerializer(recipient=FacebookIdSerializer(id=sender_detail.fb_id),
     #                                                   message=MessageDetailSerializer(type="text",
     #                                                                                   text=message_content))
