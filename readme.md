@@ -25,3 +25,7 @@ username = admin
 password = admin
 
 (P.S: Please login using username and password when navigating the django rest framework.)
+
+
+#### UPDATE:
+This project is also being currently used to test certain facebook messenger and page APIs in an attempt to eventually construct a makeshift automated reply system and hopefully a chatbot in the future.
